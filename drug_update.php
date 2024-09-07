@@ -223,6 +223,7 @@ $totalPages = ceil($totalDrugs / $limit);
                                 <th>Actions</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             <?php foreach ($drugs as $drug): ?>
                                 <tr>
