@@ -3,53 +3,64 @@ session_start();
 require 'vendor/autoload.php';
 require_once 'conn.php';
 
+// CSRF protection
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die('CSRF token validation failed');
+    }
+}
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
     header("Location: userlogin.php");
     exit();
 }
 
-$drug_id = isset($_GET['drug_id']) ? intval($_GET['drug_id']) : 0;
+$drug_id = isset($_GET['drug_id']) ? filter_var($_GET['drug_id'], FILTER_VALIDATE_INT) : 0;
+if ($drug_id === false || $drug_id === 0) {
+    die('Invalid drug ID');
+}
 
-// Fetch drug details
 $sql = "SELECT * FROM drugs WHERE drug_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $drug_id);
 $stmt->execute();
 $drug = $stmt->get_result()->fetch_assoc();
 
-// Handle form submission for issue/add
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $quantity = intval($_POST['quantity']);
-    $action = $_POST['action'];
+    $quantity = filter_var($_POST['quantity'], FILTER_VALIDATE_INT);
+    $action = in_array($_POST['action'], ['issue', 'add']) ? $_POST['action'] : '';
 
-    // Perform the transaction (issue or add)
-    $conn->begin_transaction();
+    if ($quantity === false || $quantity <= 0 || empty($action)) {
+        $error = "Invalid input data";
+    } else {
+        $conn->begin_transaction();
 
-    try {
-        $sql = "UPDATE drugs SET quantity = quantity " . ($action === 'issue' ? '-' : '+') . " ? WHERE drug_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $quantity, $drug_id);
-        $stmt->execute();
+        try {
+            $sql = "UPDATE drugs SET quantity = quantity " . ($action === 'issue' ? '-' : '+') . " ? WHERE drug_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $quantity, $drug_id);
+            $stmt->execute();
 
-        $sql = "INSERT INTO drug_transactions (drug_id, transaction_type, quantity, transaction_date) VALUES (?, ?, ?, NOW())";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isi", $drug_id, $action, $quantity);
-        $stmt->execute();
+            $sql = "INSERT INTO drug_transactions (drug_id, transaction_type, quantity, transaction_date) VALUES (?, ?, ?, NOW())";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("isi", $drug_id, $action, $quantity);
+            $stmt->execute();
 
-        $conn->commit();
-        $message = "Drug " . ($action === 'issue' ? 'issued' : 'added') . " successfully.";
-    } catch (Exception $e) {
-        $conn->rollback();
-        $error = "Error: " . $e->getMessage();
+            $conn->commit();
+            $message = "Drug " . ($action === 'issue' ? 'issued' : 'added') . " successfully.";
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error = "An error occurred. Please try again later.";
+            error_log("Error in issue_drugs.php: " . $e->getMessage());
+        }
     }
 }
 
-// Pagination
-$records_per_page = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$records_per_page = filter_var($_GET['limit'] ?? 10, FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1, 'max_range' => 100]]);
+$page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
 $offset = ($page - 1) * $records_per_page;
 
-// Fetch total number of transactions
 $total_sql = "SELECT COUNT(*) as total FROM drug_transactions WHERE drug_id = ?";
 $total_stmt = $conn->prepare($total_sql);
 $total_stmt->bind_param("i", $drug_id);
@@ -57,7 +68,6 @@ $total_stmt->execute();
 $total_result = $total_stmt->get_result()->fetch_assoc();
 $total_records = $total_result['total'];
 
-// Fetch paginated transaction history
 $sql = "SELECT * FROM drug_transactions WHERE drug_id = ? ORDER BY transaction_date DESC LIMIT ? OFFSET ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("iii", $drug_id, $records_per_page, $offset);
@@ -66,6 +76,7 @@ $transactions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $total_pages = ceil($total_records / $records_per_page);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -94,9 +105,10 @@ $total_pages = ceil($total_records / $records_per_page);
         <?php endif; ?>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <div class="mb-3">
                 <label for="quantity" class="form-label">Quantity</label>
-                <input type="number" class="form-control" id="quantity" name="quantity" required>
+                <input type="number" class="form-control" id="quantity" name="quantity" required min="1">
             </div>
             <div class="mb-3">
                 <label for="action" class="form-label">Action</label>
@@ -133,7 +145,7 @@ $total_pages = ceil($total_records / $records_per_page);
             </thead>
             <tbody>
                 <?php foreach ($transactions as $transaction): ?>
-                    <tr data-date="<?php echo date('Y-m', strtotime($transaction['transaction_date'])); ?>">
+                    <tr data-date="<?php echo htmlspecialchars(date('Y-m', strtotime($transaction['transaction_date']))); ?>">
                         <td><?php echo htmlspecialchars($transaction['transaction_id']); ?></td>
                         <td><?php echo htmlspecialchars($transaction['transaction_type']); ?></td>
                         <td><?php echo htmlspecialchars($transaction['quantity']); ?></td>
@@ -142,7 +154,6 @@ $total_pages = ceil($total_records / $records_per_page);
                 <?php endforeach; ?>
             </tbody>
         </table>
-
         <nav aria-label="Transaction history pagination">
             <ul class="pagination">
                 <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
