@@ -20,17 +20,19 @@ $total_value = array_sum(array_map(function($drug) {
     return $drug['price'] * $drug['quantity'];
 }, $drugs));
 
-// Get drugs with low stock (less than 10 units)
-$low_stock = array_filter($drugs, function($drug) {
-    return $drug['quantity'] < 10;
+// Handle search for low stock drugs
+$low_stock_search = isset($_GET['low_stock_search']) ? $_GET['low_stock_search'] : '';
+$low_stock = array_filter($drugs, function($drug) use ($low_stock_search) {
+    return $drug['quantity'] < 10 && (empty($low_stock_search) || stripos($drug['drug_name'], $low_stock_search) !== false);
 });
 
-// Get drugs expiring within 30 days
-$expiring_soon = array_filter($drugs, function($drug) {
+// Handle search for expiring soon drugs
+$expiring_search = isset($_GET['expiring_search']) ? $_GET['expiring_search'] : '';
+$expiring_soon = array_filter($drugs, function($drug) use ($expiring_search) {
     $expiry_date = new DateTime($drug['expiry_date']);
     $today = new DateTime();
     $diff = $today->diff($expiry_date);
-    return $diff->days <= 30 && $diff->invert == 0;
+    return $diff->days <= 30 && $diff->invert == 0 && (empty($expiring_search) || stripos($drug['drug_name'], $expiring_search) !== false);
 });
 
 // Get most used drugs
@@ -55,6 +57,7 @@ $recently_added_query = "SELECT drugs.drug_name, MAX(drug_transactions.transacti
 $recently_added_result = mysqli_query($conn, $recently_added_query);
 $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -152,6 +155,13 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
         <div class="row">
             <div class="col s12 m6">
                 <h4>Low Stock Drugs</h4>
+                <form action="" method="GET">
+                    <div class="input-field">
+                        <input type="text" id="low_stock_search" name="low_stock_search" value="<?php echo htmlspecialchars($low_stock_search); ?>">
+                        <label for="low_stock_search">Search Low Stock Drugs</label>
+                        <button class="btn waves-effect waves-light" type="submit">Search</button>
+                    </div>
+                </form>
                 <table class="striped">
                     <thead>
                         <tr>
@@ -171,6 +181,13 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
             </div>
             <div class="col s12 m6">
                 <h4>Expiring Soon</h4>
+                <form action="" method="GET">
+                    <div class="input-field">
+                        <input type="text" id="expiring_search" name="expiring_search" value="<?php echo htmlspecialchars($expiring_search); ?>">
+                        <label for="expiring_search">Search Expiring Drugs</label>
+                        <button class="btn waves-effect waves-light" type="submit">Search</button>
+                    </div>
+                </form>
                 <table class="striped">
                     <thead>
                         <tr>
@@ -190,7 +207,6 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
             </div>
         </div>
 
-        <!-- Most Used Drugs Section -->
         <div class="row">
             <div class="col s12">
                 <h4>Most Used Drugs</h4>
@@ -213,7 +229,6 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
             </div>
         </div>
 
-        <!-- Recently Added Drugs Section -->
         <div class="row">
             <div class="col s12">
                 <h4>Recently Added Drugs</h4>
