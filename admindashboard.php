@@ -32,9 +32,10 @@ $_SESSION['last_activity'] = time();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
         #sidebar {
             height: 100%;
@@ -43,7 +44,7 @@ $_SESSION['last_activity'] = time();
             z-index: 1;
             top: 0;
             left: 0;
-            background-color: #111;
+            background-color: #2c3e50;
             overflow-x: hidden;
             transition: 0.5s;
             padding-top: 60px;
@@ -52,12 +53,12 @@ $_SESSION['last_activity'] = time();
             padding: 8px 8px 8px 32px;
             text-decoration: none;
             font-size: 18px;
-            color: #818181;
+            color: #ecf0f1;
             display: block;
             transition: 0.3s;
         }
         #sidebar a:hover {
-            color: #f1f1f1;
+            color: #3498db;
         }
         #main {
             transition: margin-left .5s;
@@ -67,54 +68,83 @@ $_SESSION['last_activity'] = time();
         #openNav {
             font-size: 20px;
             cursor: pointer;
-            background-color: #111;
+            background-color: #2c3e50;
             color: white;
             padding: 10px 15px;
             border: none;
         }
         .logout-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #f44336;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    z-index: 1000;
-}
-
-.logout-btn:hover {
-    background-color: #d32f2f;
-}
-
-@media screen and (max-width: 768px) {
-    .logout-btn {
-        top: 5px;
-        right: 5px;
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .logout-btn {
-        position: fixed;
-        top: auto;
-        bottom: 10px;
-        right: 10px;
-        padding: 10px;
-        font-size: 12px;
-    }
-}
-
-        @media screen and (max-height: 450px) {
-            #sidebar {padding-top: 15px;}
-            #sidebar a {font-size: 18px;}
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            z-index: 1000;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        .welcome-message {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .dashboard-options {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .option-box {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .option-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .option-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .option-box p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .option-box a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            
+            transition: background-color 0.3s;
+        }
+        .option-box a:hover {
+            background-color: #2980b9;
+        }
+        @media screen and (max-width: 768px) {
+            .dashboard-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            .option-box {
+                width: 80%;
+            }
         }
     </style>
 </head>
@@ -129,11 +159,29 @@ $_SESSION['last_activity'] = time();
 </div>
 
 <div id="main">
-    <button id="sidebarToggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
-    <a href="adminlogout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    <h2>AIHWA Admin Dashboard</h2>
-    <!-- Add your main content here -->
-</div>
+        <button id="sidebarToggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+        <a href="adminlogout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        
+        <h2 class="welcome-message">Welcome, Admin!</h2>
+        
+        <div class="dashboard-options">
+            <div class="option-box">
+                <h3>DRUG REPORTS</h3>
+                <p>Generate reports and summaries on drug inventory.</p>
+                <a href="admin_summary.php">View Reports</a>
+            </div>
+            <div class="option-box">
+                <h3>DRUG INVENTORY</h3>
+                <p>Keep track of all medications, quantities, and expiration dates.</p>
+                <a href="admin_drugcheck.php">Check Inventory</a>
+            </div>
+            <div class="option-box">
+                <h3>DRUG USAGE CHECK</h3>
+                <p>Monitor and analyze drug usage patterns.</p>
+                <a href="admin_drugusage.php">Check Usage</a>
+            </div>
+        </div>
+    </div>
       <script>
             function openNav() {
         document.getElementById("sidebar").style.width = "250px";
