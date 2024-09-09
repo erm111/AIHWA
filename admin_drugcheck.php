@@ -82,10 +82,39 @@ function sortLink($field, $label) {
         }
         #sidebar a:hover { color: #3498db; }
         .pagination { text-align: center; margin-top: 20px; }
+        
+    #sidebar {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #2c3e50;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+    }
+    .sidebar-closed {
+        left: -250px;
+    }
+    .main-content-shifted {
+        margin-left: 250px;
+        transition: 0.5s;
+    }
+    .main-content-full {
+        margin-left: 0;
+    }
+    #sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 2;
+    }
     </style>
 </head>
 <body>
-    <div id="sidebar">
+    <div id="sidebar" class="sidebar-open">
         <a href="admindashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="adminusers.php"><i class="fas fa-users"></i> Check Users</a>
         <a href="admin_drugcheck.php"><i class="fas fa-pills"></i> Check Drug Inventory</a>
@@ -93,49 +122,66 @@ function sortLink($field, $label) {
         <a href="adminlogout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
-    <div class="container">
-        <h2>Drug Inventory</h2>
+    <div id="main-content" class="main-content-shifted">
+        <a href="#" id="sidebar-toggle" class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">menu</i></a>
         
-        <form class="search-form" method="GET">
-            <div class="input-field">
-                <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                <label for="search">Search Drugs</label>
-            </div>
-            <button class="btn waves-effect waves-light" type="submit">Search</button>
-        </form>
-
-        <table class="striped">
-            <thead>
-                <tr>
-                    <th><?php echo sortLink('drug_name', 'Drug Name'); ?></th>
-                    <th><?php echo sortLink('quantity', 'Quantity'); ?></th>
-                    <th><?php echo sortLink('expiry_date', 'Expiry Date'); ?></th>
-                    <th><?php echo sortLink('price', 'Price'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($drugs as $drug): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($drug['drug_name']); ?></td>
-                    <td><?php echo $drug['quantity']; ?></td>
-                    <td><?php echo $drug['expiry_date']; ?></td>
-                    <td>$<?php echo number_format($drug['price'], 2); ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <div class="pagination">
-            <?php if ($page > 1): ?>
-                <a href="?page=<?php echo $page - 1; ?>&search=<?php echo $search; ?>&sort=<?php echo $sort; ?>&order=<?php echo $order; ?>" class="btn">Previous</a>
-            <?php endif; ?>
+        <div class="container">
+            <h2>Drug Inventory</h2>
             
-            <?php if ($page < $total_pages): ?>
-                <a href="?page=<?php echo $page + 1; ?>&search=<?php echo $search; ?>&sort=<?php echo $sort; ?>&order=<?php echo $order; ?>" class="btn">Next</a>
-            <?php endif; ?>
+            <form class="search-form" method="GET">
+                <div class="input-field">
+                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>">
+                    <label for="search">Search Drugs</label>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">Search</button>
+            </form>
+
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th><?php echo sortLink('drug_name', 'Drug Name'); ?></th>
+                        <th><?php echo sortLink('quantity', 'Quantity'); ?></th>
+                        <th><?php echo sortLink('expiry_date', 'Expiry Date'); ?></th>
+                        <th><?php echo sortLink('price', 'Price'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($drugs as $drug): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($drug['drug_name']); ?></td>
+                        <td><?php echo $drug['quantity']; ?></td>
+                        <td><?php echo $drug['expiry_date']; ?></td>
+                        <td>$<?php echo number_format($drug['price'], 2); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?php echo $page - 1; ?>&search=<?php echo $search; ?>&sort=<?php echo $sort; ?>&order=<?php echo $order; ?>" class="btn">Previous</a>
+                <?php endif; ?>
+                
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?php echo $page + 1; ?>&search=<?php echo $search; ?>&sort=<?php echo $sort; ?>&order=<?php echo $order; ?>" class="btn">Next</a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebar = document.getElementById('sidebar');
+            var mainContent = document.getElementById('main-content');
+            var sidebarToggle = document.getElementById('sidebar-toggle');
+
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                sidebar.classList.toggle('sidebar-closed');
+                mainContent.classList.toggle('main-content-full');
+            });
+        });
+    </script>
 </body>
 </html>
