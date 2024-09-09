@@ -361,13 +361,14 @@ if (isset($_POST['edit_user'])) {
     </style>
 </head>
 <body>
-    <div id="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="adminusers.php"><i class="fas fa-users"></i> Check Users</a>
-        <a href="#"><i class="fas fa-pills"></i> Check Drug Inventory</a>
-        <a href="adminmanageaccount.php"><i class="fas fa-user-cog"></i> Manage Account</a>
-        <a href="adminlogout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
+<div id="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    <a href="admindashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="#"><i class="fas fa-pills"></i> Check Drug Inventory</a>
+    <a href="adminmanageaccount.php"><i class="fas fa-user-cog"></i> Manage Account</a>
+    <a href="adminlogout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
 
     <div class="container">
         <button id="sidebarToggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>

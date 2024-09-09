@@ -123,7 +123,7 @@ $_SESSION['last_activity'] = time();
 <div id="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
     <a href="adminusers.php" target="_blank"><i class="fas fa-users"></i> Check Users</a>
-    <a href="#"><i class="fas fa-pills"></i> Check Drug Inventory</a>
+    <a href="admin_drugcheck.php"><i class="fas fa-pills"></i> Check Drug Inventory</a>
     <a href="adminmanageaccount.php" target="_blank"><i class="fas fa-user-cog"></i> Manage Account</a>
     <a href="adminlogout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
