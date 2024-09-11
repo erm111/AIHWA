@@ -75,68 +75,98 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
     <style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f5f5;
+        transition: margin-left .5s;
+    }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
-        }
+    .container {
+        padding-top: 20px;
+        margin-left: 0;
+        transition: margin-left .5s;
+    }
 
+    .container.active {
+        margin-left: 250px;
+    }
+
+    .card-panel {
+        border-radius: 8px;
+    }
+
+    .summary-card {
+        text-align: center;
+    }
+
+    .summary-card i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    table {
+        background-color: white;
+    }
+
+    #sidebar {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: -250px;
+        background-color: #2c3e50;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+    }
+
+    #sidebar.active {
+        left: 0;
+    }
+
+    #sidebar a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #ecf0f1;
+        display: block;
+        transition: 0.3s;
+    }
+
+    #sidebar a:hover {
+        color: #3498db;
+    }
+
+    #sidebarToggle {
+        position: fixed;
+        left: 10px;
+        top: 10px;
+        z-index: 2;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+
+    @media screen and (max-width: 768px) {
         .container {
-            padding-top: 20px;
+            margin-left: 0;
+        }
+        #sidebar.active + .container {
             margin-left: 250px;
         }
+    }
+</style>
 
-        .card-panel {
-            border-radius: 8px;
-        }
-
-        .summary-card {
-            text-align: center;
-        }
-
-        .summary-card i {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        table {
-            background-color: white;
-        }
-
-        #sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: 0;
-            background-color: #2c3e50;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-        }
-
-        #sidebar a {
-            padding: 8px 8px 8px 32px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #ecf0f1;
-            display: block;
-            transition: 0.3s;
-        }
-
-        #sidebar a:hover {
-            color: #3498db;
-        }
-        .chart-container {
-            position: relative;
-            height: 400px;
-            width: 100%;
-        }
-    </style>
 </head>
 
 <body>
+    <button id="sidebarToggle" class="btn waves-effect waves-light">
+        <i class="material-icons">menu</i>
+    </button>
     <div id="sidebar">
         <a href="admindashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="adminusers.php"><i class="fas fa-users"></i> Check Users</a>
@@ -296,7 +326,10 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
 
     <script>
         Chart.register(ChartDataLabels);
@@ -400,6 +433,44 @@ $recently_added_drugs = mysqli_fetch_all($recently_added_result, MYSQLI_ASSOC);
         });
     </script>
 
+    <script>
+        function toggleNav() {
+            var sidebar = document.getElementById("sidebar");
+            var container = document.querySelector('.container');
+            var toggleBtn = document.getElementById("sidebarToggle");
+
+            if (sidebar && container && toggleBtn) {
+                sidebar.classList.toggle('active');
+                container.classList.toggle('active');
+                toggleBtn.innerHTML = sidebar.classList.contains('active') ? 
+                    '<i class="material-icons">close</i>' : 
+                    '<i class="material-icons">menu</i>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleNav);
+            }
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    var sidebar = document.getElementById("sidebar");
+                    var container = document.querySelector('.container');
+                    var toggleBtn = document.getElementById("sidebarToggle");
+                    
+                    if (sidebar && container && toggleBtn) {
+                        sidebar.classList.remove('active');
+                        container.classList.remove('active');
+                        toggleBtn.innerHTML = '<i class="material-icons">menu</i>';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
+
+
 
 </html>
