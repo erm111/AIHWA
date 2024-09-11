@@ -39,10 +39,11 @@ $expiring_soon = array_filter($drugs, function ($drug) use ($expiring_search) {
 $most_used_query = "SELECT drugs.drug_name, COUNT(drug_transactions.drug_id) as usage_count 
                     FROM drug_transactions 
                     JOIN drugs ON drug_transactions.drug_id = drugs.drug_id
-                    WHERE transaction_type = 'issued' 
+                    WHERE transaction_type = 'issue' 
                     GROUP BY drug_transactions.drug_id 
                     ORDER BY usage_count DESC 
                     LIMIT 5";
+
 $most_used_result = mysqli_query($conn, $most_used_query);
 $most_used_drugs = mysqli_fetch_all($most_used_result, MYSQLI_ASSOC);
 
@@ -50,7 +51,7 @@ $most_used_drugs = mysqli_fetch_all($most_used_result, MYSQLI_ASSOC);
 $recently_added_query = "SELECT drugs.drug_name, MAX(drug_transactions.transaction_date) as added_date 
                          FROM drug_transactions 
                          JOIN drugs ON drug_transactions.drug_id = drugs.drug_id
-                         WHERE transaction_type = 'added' 
+                         WHERE transaction_type = 'add' 
                          GROUP BY drug_transactions.drug_id 
                          ORDER BY added_date DESC 
                          LIMIT 5";
