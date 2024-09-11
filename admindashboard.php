@@ -175,11 +175,7 @@ $_SESSION['last_activity'] = time();
                 <p>Keep track of all medications, quantities, and expiration dates.</p>
                 <a href="admin_drugcheck.php">Check Inventory</a>
             </div>
-            <div class="option-box">
-                <h3>DRUG USAGE CHECK</h3>
-                <p>Monitor and analyze drug usage patterns.</p>
-                <a href="admin_drugusage.php">Check Usage</a>
-            </div>
+          
         </div>
     </div>
       <script>
