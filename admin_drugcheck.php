@@ -57,32 +57,17 @@ function sortLink($field, $label) {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f5f5f5; }
-        .container { padding-top: 20px; margin-left: 250px; }
-        .search-form { margin-bottom: 20px; }
-        #sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: 0;
-            background-color: #2c3e50;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-        }
-        #sidebar a {
-            padding: 8px 8px 8px 32px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #ecf0f1;
-            display: block;
-            transition: 0.3s;
-        }
-        #sidebar a:hover { color: #3498db; }
-        .pagination { text-align: center; margin-top: 20px; }
-        
+    body { 
+        font-family: 'Roboto', sans-serif; 
+        background-color: #f5f5f5; 
+    }
+    .container { 
+        padding-top: 20px; 
+        transition: margin-left .5s; 
+    }
+    .search-form { 
+        margin-bottom: 20px; 
+    }
     #sidebar {
         height: 100%;
         width: 250px;
@@ -95,14 +80,25 @@ function sortLink($field, $label) {
         transition: 0.5s;
         padding-top: 60px;
     }
-    .sidebar-closed {
+    #sidebar.sidebar-closed {
         left: -250px;
     }
-    .main-content-shifted {
-        margin-left: 250px;
-        transition: 0.5s;
+    #sidebar a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #ecf0f1;
+        display: block;
+        transition: 0.3s;
     }
-    .main-content-full {
+    #sidebar a:hover { 
+        color: #3498db; 
+    }
+    #main-content {
+        transition: margin-left .5s;
+        margin-left: 250px;
+    }
+    #main-content.main-content-full {
         margin-left: 0;
     }
     #sidebar-toggle {
@@ -111,7 +107,26 @@ function sortLink($field, $label) {
         left: 20px;
         z-index: 2;
     }
-    </style>
+    .pagination { 
+        text-align: center; 
+        margin-top: 20px; 
+    }
+    @media screen and (max-width: 768px) {
+        #sidebar {
+            left: -250px;
+        }
+        #main-content {
+            margin-left: 0;
+        }
+        #sidebar.sidebar-closed {
+            left: 0;
+        }
+        #main-content.main-content-full {
+            margin-left: 250px;
+        }
+    }
+</style>
+
 </head>
 <body>
     <a href="#" id="sidebar-toggle" class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">menu</i></a>
