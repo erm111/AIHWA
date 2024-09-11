@@ -114,6 +114,8 @@ function sortLink($field, $label) {
     </style>
 </head>
 <body>
+    <a href="#" id="sidebar-toggle" class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">menu</i></a>
+    
     <div id="sidebar" class="sidebar-open">
         <a href="admindashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="adminusers.php"><i class="fas fa-users"></i> Check Users</a>
@@ -123,8 +125,6 @@ function sortLink($field, $label) {
     </div>
 
     <div id="main-content" class="main-content-shifted">
-        <a href="#" id="sidebar-toggle" class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">menu</i></a>
-        
         <div class="container">
             <h2>Drug Inventory</h2>
             
@@ -171,17 +171,41 @@ function sortLink($field, $label) {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var sidebar = document.getElementById('sidebar');
-            var mainContent = document.getElementById('main-content');
-            var sidebarToggle = document.getElementById('sidebar-toggle');
+        function toggleNav() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var toggleBtn = document.getElementById("sidebar-toggle");
 
-            sidebarToggle.addEventListener('click', function(e) {
-                e.preventDefault();
+            if (sidebar && mainContent && toggleBtn) {
                 sidebar.classList.toggle('sidebar-closed');
                 mainContent.classList.toggle('main-content-full');
+                toggleBtn.innerHTML = sidebar.classList.contains('sidebar-closed') ? 
+                    '<i class="material-icons">menu</i>' : 
+                    '<i class="material-icons">close</i>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebarToggle = document.getElementById('sidebar-toggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleNav);
+            }
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    var sidebar = document.getElementById("sidebar");
+                    var mainContent = document.getElementById("main-content");
+                    var toggleBtn = document.getElementById("sidebar-toggle");
+                    
+                    if (sidebar && mainContent && toggleBtn) {
+                        sidebar.classList.add('sidebar-closed');
+                        mainContent.classList.add('main-content-full');
+                        toggleBtn.innerHTML = '<i class="material-icons">menu</i>';
+                    }
+                }
             });
         });
     </script>
 </body>
+
 </html>
